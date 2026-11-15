@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+dataset/
+
+# Old models and backups
+models/maintai_model_v2.pkl
+models/maintai_model_v2_backup.pkl
+models/maintenance_model.json
+models/maintenance_model.pkl
+models/maintenance_model_ai4i.pkl

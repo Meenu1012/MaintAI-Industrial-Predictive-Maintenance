@@ -1,0 +1,1122 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MaintAI | Predictive Maintenance</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    color: #172033;
+}
+
+header {
+    background: #14243d;
+    color: white;
+    padding: 24px 7%;
+}
+
+header h1 { margin: 0; }
+header p { color: #cbd5e1; margin-bottom: 0; }
+
+main {
+    max-width: 1150px;
+    margin: 35px auto;
+    padding: 0 20px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 22px;
+    box-shadow: 0 3px 15px #0000000c;
+}
+
+.overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.stat-card {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 3px 15px #0000000c;
+    border-left: 5px solid #2563eb;
+}
+
+.stat-card h3 {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+
+.stat-card p {
+    font-size: 29px;
+    font-weight: bold;
+    margin: 12px 0 0;
+}
+
+.blue { border-color: #2563eb; }
+.green { border-color: #16a34a; }
+.red { border-color: #dc2626; }
+.purple { border-color: #7c3aed; }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+}
+
+input:focus {
+    outline: 2px solid #2563eb;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+button:hover { background: #1d4ed8; }
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.reset-button { background: #475569; }
+.download-button { background: #15803d; }
+.clear-button { background: #dc2626; }
+
+#result { display: none; }
+
+#status {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.normal { color: #16a34a; }
+.failure { color: #dc2626; }
+
+#risk {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.progress-container {
+    width: 100%;
+    height: 14px;
+    background: #e2e8f0;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 12px 0 20px;
+}
+
+#progressBar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s;
+}
+
+#recommendation {
+    padding: 15px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    line-height: 1.6;
+}
+
+.analytics-row { margin: 22px 0; }
+
+.analytics-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.analytics-bar {
+    width: 100%;
+    height: 18px;
+    background: #e2e8f0;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.analytics-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s;
+}
+
+#normalBar { background: #16a34a; }
+#failureBar { background: #dc2626; }
+
+.analytics-note {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+#error { color: #dc2626; }
+.saved-message { color: #16a34a; font-size: 13px; }
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 13px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+th {
+    background: #14243d;
+    color: white;
+}
+
+tr:hover td { background: #f8fafc; }
+
+.status-normal {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.status-failure {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+.empty-message {
+    text-align: center;
+    color: #64748b;
+    padding: 25px;
+}
+
+.history-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.history-actions button { margin-top: 10px; }
+
+footer {
+    text-align: center;
+    padding: 22px;
+    color: #64748b;
+}
+
+@media(max-width: 600px) {
+    header { padding: 20px; }
+    main { margin: 20px auto; }
+    .card { padding: 18px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>MaintAI</h1>
+    <p>AI-Powered Industrial Predictive Maintenance System</p>
+</header>
+
+<main>
+
+<h2>Industrial Dashboard Overview</h2>
+
+<section class="overview">
+
+    <div class="stat-card blue">
+        <h3>Total Predictions</h3>
+        <p id="totalPredictions">0</p>
+    </div>
+
+    <div class="stat-card green">
+        <h3>Normal Machines</h3>
+        <p id="normalCount">0</p>
+    </div>
+
+    <div class="stat-card red">
+        <h3>Failure Risks</h3>
+        <p id="failureCount">0</p>
+    </div>
+
+    <div class="stat-card purple">
+        <h3>Latest Machine Status</h3>
+        <p id="latestStatus" style="font-size:19px">
+            No analysis yet
+        </p>
+    </div>
+
+</section>
+
+<!-- PREDICTION STATISTICS -->
+
+<section class="card">
+
+    <h2>Prediction Statistics</h2>
+
+    <div class="overview">
+
+        <div class="stat-card green">
+            <h3>Normal Prediction Rate</h3>
+            <p id="normalPercentage">0%</p>
+        </div>
+
+        <div class="stat-card red">
+            <h3>Failure Risk Rate</h3>
+            <p id="failurePercentage">0%</p>
+        </div>
+
+    </div>
+
+    <h3>Machine Condition Distribution</h3>
+
+    <div class="analytics-row">
+        <div class="analytics-label">
+            <span>Normal Predictions</span>
+            <span id="normalLabel">0%</span>
+        </div>
+        <div class="analytics-bar">
+            <div class="analytics-fill" id="normalBar"></div>
+        </div>
+    </div>
+
+    <div class="analytics-row">
+        <div class="analytics-label">
+            <span>Failure Risk Predictions</span>
+            <span id="failureLabel">0%</span>
+        </div>
+        <div class="analytics-bar">
+            <div class="analytics-fill" id="failureBar"></div>
+        </div>
+    </div>
+
+    <p class="analytics-note">
+        Statistics are based on successful predictions saved in this browser.
+    </p>
+
+</section>
+
+<!-- SENSOR MONITORING -->
+
+<section class="card">
+
+    <h2>Machine Sensor Monitoring</h2>
+
+    <p>Enter machine sensor readings to predict potential failure.</p>
+
+    <div class="grid">
+
+        <div>
+            <label for="air_temperature">Air Temperature (K)</label>
+            <input id="air_temperature" type="number"
+                   value="298.1" step="any" min="250" max="350">
+        </div>
+
+        <div>
+            <label for="process_temperature">Process Temperature (K)</label>
+            <input id="process_temperature" type="number"
+                   value="308.6" step="any" min="250" max="400">
+        </div>
+
+        <div>
+            <label for="rotational_speed">Rotational Speed (rpm)</label>
+            <input id="rotational_speed" type="number"
+                   value="1551" step="any" min="1" max="10000">
+        </div>
+
+        <div>
+            <label for="torque">Torque (Nm)</label>
+            <input id="torque" type="number"
+                   value="42.8" step="any" min="0" max="200">
+        </div>
+
+        <div>
+            <label for="tool_wear">Tool Wear (min)</label>
+            <input id="tool_wear" type="number"
+                   value="0" step="any" min="0" max="1000">
+        </div>
+
+    </div>
+
+    <button id="analyzeButton" onclick="predict()">
+        Analyze Machine
+    </button>
+
+    <button class="reset-button" onclick="resetInputs()">
+        Reset Inputs
+    </button>
+
+    <p id="error"></p>
+    <p id="savedMessage" class="saved-message"></p>
+
+</section>
+
+<!-- AI PREDICTION RESULT -->
+
+<section class="card" id="result">
+
+    <h2>AI Prediction Result</h2>
+
+    <p id="status"></p>
+
+    <p id="risk"></p>
+
+    <div class="progress-container">
+        <div id="progressBar"></div>
+    </div>
+
+    <h3>Maintenance Recommendation</h3>
+
+    <p id="recommendation"></p>
+
+</section>
+
+<!-- PREDICTION HISTORY -->
+
+<section class="card">
+
+    <h2>Prediction History</h2>
+
+    <p>
+        Review previous machine predictions and sensor readings.
+    </p>
+
+    <div class="overview">
+
+        <div class="stat-card blue">
+            <h3>History Records</h3>
+            <p id="historyCount">0</p>
+        </div>
+
+        <div class="stat-card green">
+            <h3>Latest Record</h3>
+            <p id="historyLatest" style="font-size:15px">
+                No records
+            </p>
+        </div>
+
+    </div>
+
+    <div class="history-actions">
+
+        <button class="download-button"
+                onclick="downloadCSV()">
+            Download CSV
+        </button>
+
+        <button class="clear-button"
+                onclick="clearHistory()">
+            Clear History
+        </button>
+
+    </div>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date & Time</th>
+                    <th>Air Temp (K)</th>
+                    <th>Process Temp (K)</th>
+                    <th>Speed (rpm)</th>
+                    <th>Torque (Nm)</th>
+                    <th>Tool Wear</th>
+                    <th>Prediction</th>
+                    <th>Failure Vote %</th>
+                </tr>
+            </thead>
+
+            <tbody id="historyTable">
+                <tr>
+                    <td colspan="9" class="empty-message">
+                        No prediction history available.
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+</main>
+
+<footer>
+    MaintAI | AI-Powered Industrial Predictive Maintenance
+    <br><br>
+    Powered by Machine Learning and AI4I 2020 Dataset
+</footer>
+
+<script>
+
+const API_URL = "http://127.0.0.1:5000/predict";
+
+const sensorFields = [
+    "air_temperature",
+    "process_temperature",
+    "rotational_speed",
+    "torque",
+    "tool_wear"
+];
+
+
+// INPUT LIMITS
+
+const limits = {
+    air_temperature: [250, 350, "Air Temperature"],
+    process_temperature: [250, 400, "Process Temperature"],
+    rotational_speed: [1, 10000, "Rotational Speed"],
+    torque: [0, 200, "Torque"],
+    tool_wear: [0, 1000, "Tool Wear"]
+};
+
+
+// SAFE STORAGE READER
+
+function readStorage(key, fallback) {
+
+    try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : fallback;
+    } catch (error) {
+        console.error("Storage error:", key, error);
+        return fallback;
+    }
+
+}
+
+
+// GET HISTORY
+
+function getHistory() {
+
+    const history = readStorage("maintai_history", []);
+
+    return Array.isArray(history) ? history : [];
+
+}
+
+
+// GET STATISTICS
+
+function getStats() {
+
+    const history = getHistory();
+
+    const total = history.length;
+
+    const failure = history.filter(
+        item => Number(item.prediction) === 1
+    ).length;
+
+    const normal = total - failure;
+
+    return {
+        total: total,
+        normal: normal,
+        failure: failure
+    };
+
+}
+
+
+// SAVE INPUTS
+
+function saveInputs() {
+
+    const inputs = {};
+
+    sensorFields.forEach(field => {
+        inputs[field] = document.getElementById(field).value;
+    });
+
+    try {
+
+        localStorage.setItem(
+            "maintai_inputs",
+            JSON.stringify(inputs)
+        );
+
+        document.getElementById("savedMessage").textContent =
+            "Sensor readings saved successfully.";
+
+    } catch (error) {
+
+        document.getElementById("savedMessage").textContent =
+            "Unable to save sensor readings.";
+
+    }
+
+}
+
+
+// UPDATE DASHBOARD
+
+function updateDashboard() {
+
+    const stats = getStats();
+
+    const total = stats.total;
+    const normal = stats.normal;
+    const failure = stats.failure;
+
+    const normalRate = total > 0
+        ? normal / total * 100 : 0;
+
+    const failureRate = total > 0
+        ? failure / total * 100 : 0;
+
+    document.getElementById("totalPredictions").textContent = total;
+    document.getElementById("normalCount").textContent = normal;
+    document.getElementById("failureCount").textContent = failure;
+
+    document.getElementById("normalPercentage").textContent =
+        normalRate.toFixed(1) + "%";
+
+    document.getElementById("failurePercentage").textContent =
+        failureRate.toFixed(1) + "%";
+
+    document.getElementById("normalLabel").textContent =
+        normalRate.toFixed(1) + "%";
+
+    document.getElementById("failureLabel").textContent =
+        failureRate.toFixed(1) + "%";
+
+    document.getElementById("normalBar").style.width =
+        normalRate + "%";
+
+    document.getElementById("failureBar").style.width =
+        failureRate + "%";
+
+    const savedResult = readStorage("maintai_result", null);
+
+    const latest = document.getElementById("latestStatus");
+
+    if (savedResult) {
+
+        latest.textContent = savedResult.status;
+
+        latest.className =
+            Number(savedResult.prediction) === 1
+                ? "failure" : "normal";
+
+    } else {
+
+        latest.textContent = "No analysis yet";
+        latest.className = "";
+
+    }
+
+}
+
+
+// DISPLAY RESULT
+
+function displayResult(data) {
+
+    document.getElementById("result").style.display = "block";
+
+    const status = document.getElementById("status");
+
+    status.textContent = data.status;
+
+    status.className =
+        Number(data.prediction) === 1 ? "failure" : "normal";
+
+    const percentage = Math.max(
+        0,
+        Math.min(100, Number(data.failure_vote_percentage))
+    );
+
+    document.getElementById("risk").textContent =
+        "Failure vote percentage: " + percentage.toFixed(2) + "%";
+
+    const bar = document.getElementById("progressBar");
+
+    bar.style.width = percentage + "%";
+
+    bar.style.background =
+        Number(data.prediction) === 1 ? "#dc2626" : "#16a34a";
+
+    document.getElementById("recommendation").textContent =
+        data.recommendation;
+
+}
+
+
+// UPDATE HISTORY TABLE
+
+function updateHistory() {
+
+    const history = getHistory();
+
+    const table = document.getElementById("historyTable");
+
+    document.getElementById("historyCount").textContent =
+        history.length;
+
+    if (history.length === 0) {
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="9" class="empty-message">
+                    No prediction history available.
+                </td>
+            </tr>
+        `;
+
+        document.getElementById("historyLatest").textContent =
+            "No records";
+
+        return;
+    }
+
+    const latestDate = new Date(history[0].timestamp);
+
+    document.getElementById("historyLatest").textContent =
+        latestDate.toLocaleDateString();
+
+    table.innerHTML = "";
+
+    history.forEach((item, index) => {
+
+        const row = document.createElement("tr");
+
+        const values = [
+            history.length - index,
+            new Date(item.timestamp).toLocaleString(),
+            item.air_temperature,
+            item.process_temperature,
+            item.rotational_speed,
+            item.torque,
+            item.tool_wear,
+            item.status,
+            item.failure_vote_percentage + "%"
+        ];
+
+        values.forEach((value, cellIndex) => {
+
+            const cell = document.createElement("td");
+
+            cell.textContent = value;
+
+            if (cellIndex === 7) {
+
+                cell.className =
+                    Number(item.prediction) === 1
+                        ? "status-failure"
+                        : "status-normal";
+
+            }
+
+            row.appendChild(cell);
+
+        });
+
+        table.appendChild(row);
+
+    });
+
+}
+
+
+// RESTORE DATA
+
+function restoreData() {
+
+    const savedInputs = readStorage("maintai_inputs", {});
+
+    sensorFields.forEach(field => {
+
+        if (
+            savedInputs[field] !== undefined &&
+            savedInputs[field] !== null
+        ) {
+
+            document.getElementById(field).value =
+                savedInputs[field];
+
+        }
+
+        document.getElementById(field).addEventListener(
+            "input",
+            saveInputs
+        );
+
+    });
+
+    const savedResult = readStorage("maintai_result", null);
+
+    if (
+        savedResult &&
+        [0, 1].includes(Number(savedResult.prediction)) &&
+        Number.isFinite(Number(savedResult.failure_vote_percentage))
+    ) {
+        displayResult(savedResult);
+    }
+
+    updateDashboard();
+    updateHistory();
+
+}
+
+
+// PREDICT MACHINE
+
+async function predict() {
+
+    const values = {};
+
+    const errorElement = document.getElementById("error");
+    const savedMessage = document.getElementById("savedMessage");
+
+    errorElement.textContent = "";
+    savedMessage.textContent = "";
+
+    // VALIDATE SENSOR READINGS
+
+    for (const field of sensorFields) {
+
+        const input = document.getElementById(field);
+        const raw = input.value.trim();
+
+        const [min, max, label] = limits[field];
+
+        if (raw === "") {
+
+            errorElement.textContent =
+                "Please enter " + label + ".";
+
+            input.focus();
+            return;
+
+        }
+
+        const value = Number(raw);
+
+        if (
+            !Number.isFinite(value) ||
+            value < min ||
+            value > max
+        ) {
+
+            errorElement.textContent =
+                label + " must be between " +
+                min + " and " + max + ".";
+
+            input.focus();
+            return;
+
+        }
+
+        values[field] = value;
+
+    }
+
+
+    const button = document.getElementById("analyzeButton");
+
+    button.disabled = true;
+    button.textContent = "Analyzing...";
+
+    try {
+
+        const response = await fetch(API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(values)
+
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Prediction failed.");
+        }
+
+        const prediction = Number(data.prediction);
+
+        const percentage = Number(data.failure_vote_percentage);
+
+        if (
+            ![0, 1].includes(prediction) ||
+            !Number.isFinite(percentage) ||
+            percentage < 0 ||
+            percentage > 100
+        ) {
+
+            throw new Error("Invalid prediction response.");
+
+        }
+
+
+        // PREPARE RESULT
+
+        const resultData = {
+
+            ...values,
+
+            prediction: prediction,
+
+            status: prediction === 1
+                ? "Failure Risk"
+                : "Normal",
+
+            failure_vote_percentage: percentage,
+
+            recommendation: prediction === 1
+                ? "Inspect the machine and schedule maintenance."
+                : "Continue routine monitoring."
+
+        };
+
+
+        // SAVE LATEST RESULT
+
+        localStorage.setItem(
+            "maintai_result",
+            JSON.stringify(resultData)
+        );
+
+
+        // SAVE HISTORY
+
+        const history = getHistory();
+
+        history.unshift({
+
+            ...resultData,
+
+            timestamp: new Date().toISOString()
+
+        });
+
+        // KEEP LATEST 500 RECORDS
+
+        if (history.length > 500) {
+            history.length = 500;
+        }
+
+        localStorage.setItem(
+            "maintai_history",
+            JSON.stringify(history)
+        );
+
+
+        // SAVE SENSOR INPUTS
+
+        localStorage.setItem(
+            "maintai_inputs",
+            JSON.stringify(values)
+        );
+
+
+        // UPDATE SCREEN
+
+        displayResult(resultData);
+
+        updateDashboard();
+
+        updateHistory();
+
+        savedMessage.textContent =
+            "Prediction saved successfully.";
+
+    } catch (error) {
+
+        errorElement.textContent =
+            "Prediction error: " + error.message;
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Analyze Machine";
+
+    }
+
+}
+
+
+// DOWNLOAD HISTORY AS CSV
+
+function downloadCSV() {
+
+    const history = getHistory();
+
+    if (history.length === 0) {
+
+        alert("No prediction history available to download.");
+
+        return;
+
+    }
+
+    const headers = [
+        "Prediction ID",
+        "Date and Time",
+        "Air Temperature (K)",
+        "Process Temperature (K)",
+        "Rotational Speed (rpm)",
+        "Torque (Nm)",
+        "Tool Wear (min)",
+        "Prediction",
+        "Failure Vote Percentage"
+    ];
+
+    const rows = history.map((item, index) => [
+
+        history.length - index,
+
+        new Date(item.timestamp).toLocaleString(),
+
+        item.air_temperature,
+
+        item.process_temperature,
+
+        item.rotational_speed,
+
+        item.torque,
+
+        item.tool_wear,
+
+        item.status,
+
+        item.failure_vote_percentage
+
+    ]);
+
+    function escapeCSV(value) {
+
+        return '"' +
+            String(value).replace(/"/g, '""') +
+            '"';
+
+    }
+
+    const csv = [
+        headers,
+        ...rows
+    ].map(row => row.map(escapeCSV).join(",")).join("\r\n");
+
+    const blob = new Blob(
+        ["\uFEFF" + csv],
+        { type: "text/csv;charset=utf-8;" }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "MaintAI_Prediction_History.csv";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+// CLEAR HISTORY
+
+function clearHistory() {
+
+    if (!confirm("Are you sure you want to delete all prediction history?")) {
+        return;
+    }
+
+    localStorage.removeItem("maintai_history");
+
+    updateHistory();
+    updateDashboard();
+
+}
+
+
+// RESET SENSOR INPUTS
+
+function resetInputs() {
+
+    if (!confirm("Clear the sensor input fields?")) {
+        return;
+    }
+
+    sensorFields.forEach(field => {
+
+        document.getElementById(field).value = "";
+
+    });
+
+    localStorage.removeItem("maintai_inputs");
+
+    document.getElementById("error").textContent = "";
+
+    document.getElementById("savedMessage").textContent =
+        "Sensor inputs cleared.";
+
+}
+
+
+// INITIALIZE
+
+window.addEventListener("DOMContentLoaded", restoreData);
+
+</script>
+
+</body>
+</html>
